@@ -21,7 +21,7 @@ module Counter(
         else if(Xmode == 2'b10) begin
                 deltaX = 4;
         end
-        else if(Xmode = 2'b11) begin
+        else if(Xmode == 2'b11) begin
                 deltaX = 8;
         end
     end

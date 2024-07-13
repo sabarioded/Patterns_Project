@@ -29,7 +29,7 @@ module Ramp(
         else if(Y == 2'b10) begin
                 deltaY = 16;
         end
-        else if(Y = 2'b11) begin
+        else if(Y == 2'b11) begin
                 deltaY = 1290;
         end
     end
