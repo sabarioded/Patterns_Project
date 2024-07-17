@@ -9,45 +9,45 @@ Y = '11' => deltaY=1290
 Also this module has an Asynchronous active low reset and an active high enable.
 */
 module Ramp(
-    input clk,
-    input rst_n, //Asynchronous active low
-    input [1:0] Y,
-    input ramp_enb, //Active high
-    input delta,
-    output [11:0]out );
+	input clk,
+	input rst_n, //Asynchronous active low
+	input [1:0] Y,
+	input ramp_enb, //Active high
+	input delta,
+	output reg[11:0]out );
 
-    reg[11:0] deltaY;
+	reg[11:0] deltaY;
 
-    //Initialize the value of deltaY
-    always@(*) begin
-        if(Y == 2'b00) begin
-            deltaY = 0;
-        end
-        else if(Y == 2'b01) begin
-                deltaY = 1;
-        end 
-        else if(Y == 2'b10) begin
-                deltaY = 16;
-        end
-        else if(Y == 2'b11) begin
-                deltaY = 1290;
-        end
-    end
-    
-    //add deltaY every time delta rises to the output
-    always@(posedge clk,negedge rst) begin
-        if(rst_n) begin
-            out <= 0;
-        end else begin
-            if(!ramp_enb) begin
-                out <= 0;
-            end else begin
-                if(delta) begin
-                    out <= out + deltaY;
-                end else begin
-                    out <= out;
-                end
-            end
-        end
-    end
+	//Initialize the value of deltaY
+	always@(*) begin
+		if(Y == 2'b00) begin
+			deltaY = 0;
+		end
+		else if(Y == 2'b01) begin
+				deltaY = 1;
+		end 
+		else if(Y == 2'b10) begin
+				deltaY = 16;
+		end
+		else if(Y == 2'b11) begin
+				deltaY = 1290;
+		end
+	end
+	
+	//add deltaY every time delta rises to the output
+	always@(posedge clk,negedge rst_n) begin
+		if(rst_n) begin
+			out <= 0;
+		end else begin //rst_n = 0
+			if(!ramp_enb) begin
+				out <= 0;
+			end else begin //ramp_enb = 1
+				if(delta) begin
+					out <= out + deltaY;
+				end else begin
+					out <= out;
+				end
+			end
+		end
+	end
 endmodule
