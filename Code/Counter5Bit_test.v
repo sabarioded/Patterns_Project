@@ -11,9 +11,12 @@ reg clk;
 reg rst_n;
 reg b5_enb;
 reg newLine;
+reg rise;
 wire endFrame;
+wire [11:0] cnt;
 
 Counter5Bit dut (.clk(clk),.rst_n(rst_n),.b5_enb(b5_enb),.newLine(newLine),.endFrame(endFrame));
+t_counter test_cnt(.clk(clk),.rst_n(rst_n),.enb(b5_enb),.rise(rise),.cnt(cnt));
 
 initial begin
 	clk = 0;
@@ -23,6 +26,7 @@ always begin
 end
 initial begin
 	rst_n = 1;
+	rise = 1;
 	@(negedge clk);
 	rst_n = 0;
 	b5_enb = 0;
