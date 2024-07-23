@@ -24,20 +24,21 @@ module Counter( // =================
 // =================
 //		Inputs
 // =================
-input 			clk;		//60ns master clock	
-input 			rst_n;		//Asynchronous active low reset
-input 			cnt_enb;	//Active high enable
-input [1:0] 	Xmode;		//The value of deltaX (00 for 0, 01 for 1, 10 for 4, 11 for 8)
-input [11:0] 	LoadVal;	//The value to add to deltaX
+input 				clk;		//60ns master clock	
+input 				rst_n;		//Asynchronous active low reset
+input 				cnt_enb;	//Active high enable
+input [1:0] 		Xmode;		//The value of deltaX (00 for 0, 01 for 1, 10 for 4, 11 for 8)
+input [11:0] 		LoadVal;	//The value to add to deltaX
 
 // =================
 //		Outputs
 // =================
-output reg [11:0]	out;		//The counter output
+output [11:0]		out;		//The counter output
 
 //----------------------------------------------------------------------------------------------------------------------------
+reg [11:0]			out;		
+reg [3:0] 			deltaX;
 
-reg [3:0] deltaX;
 parameter ZERO=2'b00, ONE=2'b01, FOUR=2'b10, EIGHT=2'b11;
 		
 //initialize the value of deltaX

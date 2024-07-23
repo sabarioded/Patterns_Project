@@ -2,7 +2,15 @@
  * File          : Control.v
  * Project       : Patterns
  * Author        : Oded and Margarita
- * Description   : 
+ * Description   : This module is the control block of the system.
+					This state mealy machine has 7 states:
+					IDLE: while the system is inactive.
+					START: prepare the system for the next run.
+					NORMAL: Count up to 4095 using gray code.
+					CONSTANT: test mode, the output is a constant val from user input, 1290 values.
+					CB1x1: test mode, the output is a 1x1 checkerboard, white is 12'b0 and black is 12'b1. 1290 values.
+					CB2x2: test mode, the output is a 2x2 checkerboard where white is 12'b0 and black is 12'b1, 1290 values. 
+					RAMP: test mode, count with increments of deltaX between coloumns and deltaY between rows, 1290 values. 
  *------------------------------------------------------------------------------*/
 module Control( // =================
 				//		Inputs
@@ -48,24 +56,35 @@ input [2:0] 	Mode;			//work mode
 // =================
 //		Outputs
 // =================
-output reg		b12_enb;		//enable for Counter12Bit module
-output reg		b5_enb;			//enable for Counter5Bit module
-output reg		ramp_enb;		//enable for Ramp module
-output reg		cnt_enb;		//enable for Counter module
-output reg		test;			//1 if in test mode, 0 if in regular mode
-output reg		newLine;		//1 when a new count starts
-output reg		BinaryOrGray;	//1 for Gray count, 0 for Binary count
-output reg		delta;			//1 for increment the starting value in the next row by deltaY (ramp mode)
-output reg[1:0]	Xmode;			//deltaX (00 for '0', 01 for '1', 10 for '4', 11 for '8')
-output reg[1:0]	ValSel;			//Select for LoadVal (00 for ramp, 01 for constant, 10 for 12'b1, 11 for counter output)
+output 			b12_enb;		//enable for Counter12Bit module
+output 			b5_enb;			//enable for Counter5Bit module
+output 			ramp_enb;		//enable for Ramp module
+output 			cnt_enb;		//enable for Counter module
+output 			test;			//1 if in test mode, 0 if in regular mode
+output 			newLine;		//1 when a new count starts
+output 			BinaryOrGray;	//1 for Gray count, 0 for Binary count
+output 			delta;			//1 for increment the starting value in the next row by deltaY (ramp mode)
+output [1:0]	Xmode;			//deltaX (00 for '0', 01 for '1', 10 for '4', 11 for '8')
+output [1:0]	ValSel;			//Select for LoadVal (00 for ramp, 01 for constant, 10 for 12'b1, 11 for counter output)
 
 //----------------------------------------------------------------------------------------------------------------------------
+reg				b12_enb;		
+reg				b5_enb;			
+reg				ramp_enb;		
+reg				cnt_enb;		
+reg				test;			
+reg				newLine;		
+reg				BinaryOrGray;	
+reg				delta;			
+reg [1:0]		Xmode;			
+reg [1:0]		ValSel;	
+reg [2:0] 		STATE;
+reg [2:0]		NEXT_STATE
+reg [1:0] 		flag;
+reg 			flag2x2;
 
 parameter IDLE=0, START=1, Normal=2, Constant=3, CB1x1=4 ,CB2x2=5 ,Ramp=6;
 parameter Regular=1, Const=2, White1x1=3, Black1x1=4, White2x2=5, Black2x2=6, RampMode=7;
-reg[2:0] STATE, NEXT_STATE;
-reg [1:0] flag;
-reg flag2x2;
 
 always@(STATE or Mode or X or flag or flag2x2) begin
 	

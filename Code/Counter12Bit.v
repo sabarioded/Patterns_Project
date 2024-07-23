@@ -34,11 +34,11 @@ input 		 	test;		// '1' for test, '0' for normal mode
 // =================
 //		Outputs
 // =================
-output reg 		endLine;	//When the line ends
+output	 		endLine;	//When the line ends
 
 //----------------------------------------------------------------------------------------------------------------------------
-
-reg[11:0] count;
+reg 			endLine;
+reg [11:0] 		count;
 	
 //check if the count has finished.
 always@(test or count) begin

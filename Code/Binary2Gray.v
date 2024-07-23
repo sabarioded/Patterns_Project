@@ -25,9 +25,10 @@ input [11:0] 		in;		//12 bits binary number to convert
 // =================
 //		Outputs
 // =================
-output reg [11:0]	out;	//converted gray code
+output [11:0]		out;	
 
 //----------------------------------------------------------------------------------------------------------------------------
+reg [11:0] 			out;
 
 integer i;
 always@(in) begin

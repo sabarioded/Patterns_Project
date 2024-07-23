@@ -2,7 +2,7 @@
  * File          : Top.v
  * Project       : Patterns
  * Author        : Oded and Margarita
- * Description   : 
+ * Description   : This module serves as the comprehensive unit that interconnects all the components within the system.
  *------------------------------------------------------------------------------*/
 module Top( // =================
 			//		Inputs
@@ -27,37 +27,38 @@ module Top( // =================
 // =================
 //		Inputs
 // =================
-input 			clk;			//60ns master clock	
-input 			rst_n;			//Asynchronous active low reset
-input 			f_sync;			//First sync signal
-input 			sync;			//Sync signal, starts the count
-input [11:0]	constVal;		//constant value 
-input [1:0]		X;				//deltaX for ramp mode
-input [1:0] 	Y;				//deltaY for ramp mode
-input [2:0] 	Mode;			//work mode
+input 				clk;			//60ns master clock	
+input 				rst_n;			//Asynchronous active low reset
+input 				f_sync;			//First sync signal
+input 				sync;			//Sync signal, starts the count
+input [11:0]		constVal;		//constant value 
+input [1:0]			X;				//deltaX for ramp mode
+input [1:0] 		Y;				//deltaY for ramp mode
+input [2:0] 		Mode;			//work mode
 
 // =================
 //		Outputs
 // =================
-output reg[11:0]	cnt;		//output count
+output [11:0]		cnt;		//output count
 
 //----------------------------------------------------------------------------------------------------------------------------
-wire 		newLine;
-wire		endLine;
-wire 		endFrame;
-wire		test;
-wire		b12_enb;
-wire		b5_enb;
-wire		cnt_enb;
-wire		ramp_enb;
-wire [1:0]	Xmode;
-reg[11:0] LoadVal;
-wire [1:0]	ValSel;
-wire		delta;
-wire [11:0]	ramp_out;
-wire [11:0]	counter_out;
-wire 		BinaryOrGray;
-wire [11:0]	gray_converter;
+reg [11:0]			cnt;
+wire 				newLine;
+wire				endLine;
+wire 				endFrame;
+wire				test;
+wire				b12_enb;
+wire				b5_enb;
+wire				cnt_enb;
+wire				ramp_enb;
+wire [1:0]			Xmode;
+reg  [11:0] 		LoadVal;
+wire [1:0]			ValSel;
+wire				delta;
+wire [11:0]			ramp_out;
+wire [11:0]			counter_out;
+wire 				BinaryOrGray;
+wire [11:0]			gray_converter;
 
 parameter Ramp=0, Const=1, Ones=2, Out=3;
 parameter Binary=0, Gray=1;

@@ -33,11 +33,11 @@ input 			newLine;	//increments when a new line starts
 // =================
 //		Outputs
 // =================
-output reg 		endFrame;	//Sends a signal when a frame ends
+output 			endFrame;	//Sends a signal when a frame ends
 
 //----------------------------------------------------------------------------------------------------------------------------
-
-reg[4:0] count;
+reg 			endFrame;
+reg[4:0] 		count;
 
 //check if the fame is finished.
 always@(count) begin

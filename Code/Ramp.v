@@ -31,20 +31,21 @@ module Ramp( // =================
 // =================
 //		Inputs
 // =================
-input 			clk;		//60ns master clock	
-input 			rst_n;		//Asynchronous active low reset
-input 			ramp_enb;	//Active high enable
-input 		 	delta;		//1 - Increments the output by deltaY
-input [1:0] 	Y;			//The value of deltaY (00 for 0, 01 for 1, 10 for 16, 11 for 1290)
+input 				clk;		//60ns master clock	
+input 				rst_n;		//Asynchronous active low reset
+input 				ramp_enb;	//Active high enable
+input 		 		delta;		//1 - Increments the output by deltaY
+input [1:0] 		Y;			//The value of deltaY (00 for 0, 01 for 1, 10 for 16, 11 for 1290)
 
 // =================
 //		Outputs
 // =================
-output reg [11:0]	out;	//num_of_delta*deltaY
+output [11:0]		out;	//num_of_delta*deltaY
 
 //----------------------------------------------------------------------------------------------------------------------------
+reg [11:0]			out;
+reg [10:0] 			deltaY;
 
-reg[10:0] deltaY;
 parameter Y0=2'b00, Y1=2'b01, Y16=2'b10, Y1290=2'b11;
 
 //Initialize the value of deltaY
