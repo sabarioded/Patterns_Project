@@ -25,7 +25,7 @@ module Counter5Bit( // =================
 // =================
 //		Inputs
 // =================
-input 			clk;		//60ns master clock	
+input 			clk;		//16ns master clock	
 input 			rst_n;		//Asynchronous active low reset
 input 			b5_enb;		//Active high enable
 input 			newLine;	//increments when a new line starts
@@ -42,25 +42,25 @@ reg[4:0] 		count;
 //check if the fame is finished.
 always@(count) begin
 	if(count == 5'd24) begin
-		endFrame = 1;
+		endFrame = 1'b1;
 	end else begin
-		endFrame = 0;
+		endFrame = 1'b0;
 	end
 end
 
 //count until the frame is finished every time newLine rises.
 always@(posedge clk or negedge rst_n) begin
-	if(rst_n) begin
-		count <= 0;
+	if(~rst_n) begin
+		count <= 12'h000;
 	end else begin ///rst_n = 0
 		if(b5_enb) begin
 			if(newLine) begin
-				count <= count + 1;
+				count <= count + 12'h001;
 			end else begin
 				count <= count;
 			end
 		end else begin //5b_enb = 0
-			count <= 0;
+			count <= 12'h000;
 		end
 	end
 end

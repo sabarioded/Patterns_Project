@@ -31,7 +31,7 @@ module Ramp( // =================
 // =================
 //		Inputs
 // =================
-input 				clk;		//60ns master clock	
+input 				clk;		//16ns master clock	
 input 				rst_n;		//Asynchronous active low reset
 input 				ramp_enb;	//Active high enable
 input 		 		delta;		//1 - Increments the output by deltaY
@@ -40,7 +40,7 @@ input [1:0] 		Y;			//The value of deltaY (00 for 0, 01 for 1, 10 for 16, 11 for 
 // =================
 //		Outputs
 // =================
-output [11:0]		out;	//num_of_delta*deltaY
+output [11:0]		out;		//num_of_delta*deltaY
 
 //----------------------------------------------------------------------------------------------------------------------------
 reg [11:0]			out;
@@ -51,21 +51,21 @@ parameter Y0=2'b00, Y1=2'b01, Y16=2'b10, Y1290=2'b11;
 //Initialize the value of deltaY
 always@(Y) begin
 	case(Y)
-		Y0:			deltaY = 0;
-		Y1:			deltaY = 1;
-		Y16:		deltaY = 16;
-		Y1290:		deltaY = 1290;
-		default:	deltaY = 0;
+		Y0:			deltaY = 11'h000; //0
+		Y1:			deltaY = 11'h001; //1
+		Y16:		deltaY = 11'h010; //16
+		Y1290:		deltaY = 11'h50A; //1290
+		default:	deltaY = 11'h000;
 	endcase
 end
 	
 //add deltaY every time delta rises to the output
 always@(posedge clk or negedge rst_n) begin
-	if(rst_n) begin
-		out <= 0;
+	if(~rst_n) begin
+		out <= 12'h000;
 	end else begin //rst_n = 0
 		if(!ramp_enb) begin
-			out <= 0;
+			out <= 12'h000;
 		end else begin //ramp_enb = 1
 			if(delta) begin
 				out <= out + {1'b0,deltaY};

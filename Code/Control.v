@@ -44,7 +44,7 @@ module Control( // =================
 // =================
 //		Inputs
 // =================
-input 			clk;			//60ns master clock	
+input 			clk;			//16ns master clock	
 input 			rst_n;			//Asynchronous active low reset
 input 			f_sync;			//First sync signal
 input 			sync;			//Sync signal, starts the count
@@ -79,190 +79,172 @@ reg				delta;
 reg [1:0]		Xmode;			
 reg [1:0]		ValSel;	
 reg [2:0] 		STATE;
-reg [2:0]		NEXT_STATE
+reg [2:0]		NEXT_STATE;
 reg [1:0] 		flag;
 reg 			flag2x2;
 
-parameter IDLE=0, START=1, Normal=2, Constant=3, CB1x1=4 ,CB2x2=5 ,Ramp=6;
-parameter Regular=1, Const=2, White1x1=3, Black1x1=4, White2x2=5, Black2x2=6, RampMode=7;
+parameter IDLE=3'b000, START=3'b001, NORMAL=3'b010, CONSTANT=3'b011, CB1x1=3'b100 ,CB2x2=3'b101 ,RAMP=3'b110; //Possible states
+parameter REGULAR=3'b001, CONST=3'b010, WHITE1x1=3'b011, BLACK1x1=3'b100, WHITE2x2=3'b101, BLACK2x2=3'b110, RAMP_MODE=3'b111; //Work modes
 
-always@(STATE or Mode or X or flag or flag2x2) begin
+//Calculate the next state
+always@(STATE or Mode or sync or f_sync or endFrame or endLine) begin
+	case(STATE)
+		IDLE: 	  NEXT_STATE = (f_sync & sync) 		? START 	: IDLE; 
+		START: 	  NEXT_STATE = (Mode == REGULAR) 	? NORMAL 	: 
+							   (Mode == CONST) 	 	? CONSTANT 	:
+							   (Mode == WHITE1x1) 	? CB1x1 	:
+							   (Mode == BLACK1x1) 	? CB1x1 	:
+							   (Mode == WHITE2x2) 	? CB2x2 	:
+							   (Mode == BLACK2x2) 	? CB2x2 	:
+							   (Mode == RAMP_MODE) 	? RAMP 		: IDLE;
+		NORMAL:   NEXT_STATE = sync 				? START 	: 
+							   (endFrame & endLine) ? IDLE 		: NORMAL;
+		CONSTANT: NEXT_STATE = sync 				? START 	: 
+							   (endFrame & endLine) ? IDLE 		: CONSTANT;
+		CB1x1:    NEXT_STATE = sync 				? START 	: 
+							   (endFrame & endLine) ? IDLE 		: CB1x1;
+		CB2x2:    NEXT_STATE = sync 				? START 	: 
+				               (endFrame & endLine) ? IDLE 		: CB2x2;
+		RAMP:     NEXT_STATE = sync 				? START 	: 
+				               (endFrame & endLine) ? IDLE 		: RAMP;
+		default:  NEDXT_STATE = IDLE;
+	endcase
+end
+
+
+
+always@(STATE or Mode or X or flag or flag2x2 or endLine or sync) begin
 	
 	case(STATE)
 		IDLE: begin
-			b12_enb = 0;
-			b5_enb = 0;
-			ramp_enb = 0;
-			cnt_enb = 0;
-		end
+			b12_enb = 1'b0;
+			b5_enb = 1'b0;
+			ramp_enb = 1'b0;
+			cnt_enb = 1'b0;
+		end //end IDLE mode
 		START: begin
 			case(Mode)
-				Regular:begin
-					BinaryOrGray = 1;
-					newLine = 1;
-					test = 0;
-					NEXT_STATE = Normal;
+				REGULAR:begin
+					BinaryOrGray = 1'b1;
+					newLine = 1'b1;
+					test = 1'b0;
 				end
-				Const:begin
-					newLine = 1;
+				CONST:begin
+					newLine = 1'b1;
 					ValSel = 2'b01;
-					NEXT_STATE = Constant;
 				end
-				White1x1:begin
-					newLine = 1;
-					if(flag[0] == 0)
+				WHITE1x1:begin
+					newLine = 1'b1;
+					if(flag[0] == 1'b0)
 						ValSel = 2'b00;
 					else
 						ValSel = 2'b10;
-					NEXT_STATE = CB1x1;
 				end
-				Black1x1:begin
-					newLine = 1;
-					if(flag[0] == 0)
+				BLACK1x1:begin
+					newLine = 1'b1;
+					if(flag[0] == 1'b0)
 						ValSel = 2'b10;
 					else
 						ValSel = 2'b00;
-					NEXT_STATE = CB1x1;
 				end
-				White2x2:begin
-					newLine = 1;
-					if(flag[1] == 0)
+				WHITE2x2:begin
+					newLine = 1'b1;
+					if(flag[1] == 1'b0)
 						ValSel = 2'b00;
 					else
 						ValSel = 2'b10;
-					NEXT_STATE = CB2x2;
 				end
-				Black2x2:begin
-					newLine = 1;
-					if(flag[1] == 0)
+				BLACK2x2:begin
+					newLine = 1'b1;
+					if(flag[1] == 1'b0)
 						ValSel = 2'b10;
 					else
 						ValSel = 2'b00;
-					NEXT_STATE = CB2x2;
 				end
-				RampMode:begin
-					ramp_enb = 1;
-					newLine = 1;
+				RAMP_MODE:begin
+					ramp_enb = 1'b1;
+					newLine = 1'b1;
 					ValSel = 2'b00;
-					NEXT_STATE = Ramp;
 				end
 			endcase
-		end
-		Normal: begin
-			test = 0;
-			BinaryOrGray = 1;
-			if(endLine == 0) begin
-				Xmode = 1;
+		end//End START mode
+		NORMAL: begin
+			test = 1'b0;
+			BinaryOrGray = 1'b1;
+			if(endLine == 1'b0) begin
+				Xmode = 1'b1;
 				ValSel = 2'b11;
+			end else begin
+				cnt_enb = 1'b0;
+				b12_enb = 1'b0;
 			end
-			else begin
-				cnt_enb = 0;
-				b12_enb = 0;
-				if(endFrame == 1) begin
-					NEXT_STATE = IDLE;
-				end
-			end
-			if(sync == 1) begin
-				NEXT_STATE = START;
-			end
-			else
-				NEXT_STATE = STATE;
-		end
-		Constant: begin
-			if(endLine == 0) begin
-				Xmode = 0;
+		end //end NORMAL mode
+		CONSTANT: begin
+			if(endLine == 1'b0) begin
+				Xmode = 1'b0;
 				ValSel = 2'b01;
+			end else begin
+				cnt_enb = 1'b0;
+				b12_enb = 1'b0;
 			end
-			else begin
-				cnt_enb = 0;
-				b12_enb = 0;
-				if(endFrame == 1) begin
-					NEXT_STATE = IDLE;
-				end
-			end
-			if(sync == 1) begin
-				NEXT_STATE = START;
-			end
-			else
-				NEXT_STATE = STATE;
-		end
+		end //end CONSTANT mode
 		CB1x1: begin
-			if(endLine == 0) begin
+			if(endLine == 1'b0) begin
 				ValSel[1] = ~ValSel[1];
+			end else begin
+				cnt_enb = 1'b0;
+				b12_enb = 1'b0;
 			end
-			else begin
-				cnt_enb = 0;
-				b12_enb = 0;
-				if(endFrame == 1) begin
-					NEXT_STATE = IDLE;
-				end
-			end
-			if(sync == 1) begin
+			if(sync == 1'b1)
 				flag[0] = ~flag[0];
-				NEXT_STATE = START;
-			end
-			else
-				NEXT_STATE = STATE;
-		end
+			else 
+				flag[0] = flag[0];
+		end // End CB1x1 mode
 		CB2x2: begin
-			if(endLine == 0) begin
+			if(endLine == 1'b0) begin
 				ValSel[1] = (flag2x2) ? ~ValSel[1]:ValSel[1];
 				flag2x2 = ~flag2x2;
+			end else begin
+				cnt_enb = 1'b0;
+				b12_enb = 1'b0;
 			end
-			else begin
-				cnt_enb = 0;
-				b12_enb = 0;
-				if(endFrame == 1) begin
-					NEXT_STATE = IDLE;
-				end
-			end
-			if(sync == 1) begin
-				flag = flag + 1;
-				NEXT_STATE = START;
-			end
+			if(sync == 1'b1)
+				flag = flag + 2'b01;
 			else
-				NEXT_STATE = STATE;
-		end
-		Ramp: begin
-			if(endLine == 0) begin
+				flag = flag;
+		end // End CB2x2 mode
+		RAMP: begin
+			if(endLine == 1'b0) begin
 				Xmode = X;
 				ValSel = 2'b11;
+			end else begin
+				cnt_enb = 1'b0;
+				b12_enb = 1'b0;
 			end
-			else begin
-				cnt_enb = 0;
-				b12_enb = 0;
-				if(endFrame == 1) begin
-					NEXT_STATE = IDLE;
-				end
-			end
-			if(sync == 1) begin
-				delta = 1;
-				NEXT_STATE = START;
-			end
+			if(sync == 1'b1)
+				delta = 1'b1;
 			else
-				NEXT_STATE = STATE;
-		end
+				delta = 1'b0;
+		end // End RAMP mode
 		default begin
-			b12_enb = 1;
-			b5_enb = 1;
-			ramp_enb = 0;
-			cnt_enb = 1;
-			test = 1;
-			newLine = 0;
-			BinaryOrGray = 0;
-			delta = 0;
-			Xmode = 0;
-			ValSel = 0;
-			flag = 0;
-			flag2x2 =  0;
-			NEXT_STATE = STATE;
+			b12_enb = 1'b1;
+			b5_enb = 1'b1;
+			ramp_enb = 1'b0;
+			cnt_enb = 1'b1;
+			test = 1'b1;
+			newLine = 1'b0;
+			BinaryOrGray = 1'b0;
+			delta = 1'b0;
+			Xmode = 1'b0;
+			ValSel = 1'b0;
+			flag = 1'b0;
+			flag2x2 =  1'b0;
 		end
 	endcase
-	
 end
 
 always@(posedge clk or negedge rst_n) begin
-	if(rst_n) begin
+	if(~rst_n) begin
 		STATE <= IDLE;
 	end else begin
 		STATE <= NEXT_STATE;
