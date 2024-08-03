@@ -10,35 +10,37 @@ module Pattern_Generator_ref (
 // =================
 //		Inputs
 // =================
-	input 				clk;			//16ns master clock	
-	input 				rst_n;			//Asynchronous active low reset
-	input 				f_sync;			//First sync signal
-	input 				sync;			//Sync signal, starts the count
-	input [11:0]		constVal;		//constant value 
-	input [1:0]			X;				//deltaX for ramp mode
-	input [1:0] 		Y;				//deltaY for ramp mode
-	input [2:0] 		Mode;			//work mode
+	input 				clk,			//16ns master clock	
+	input 				rst_n,			//Asynchronous active low reset
+	input 				f_sync,			//First sync signal
+	input 				sync,			//Sync signal, starts the count
+	input [11:0]		constVal,		//constant value 
+	input [1:0]			X,				//deltaX for ramp mode
+	input [1:0] 		Y,				//deltaY for ramp mode
+	input [2:0] 		Mode,			//work mode
 
 // =================
 //		Outputs
 // =================
-	output [11:0]		cnt;		//output count
+	output [11:0]		cnt		//output count
 );
 logic [11:0] Counter,counter_out,counterY;
 logic [4:0] endCnt;
 logic endFrame;
 logic FLAG;
-logic FLAG2x2;
+logic [1:0] FLAG2x2;
 logic [11:0] deltaX,deltaY;
+reg [2:0] 		STATE;
+reg [2:0]		NEXT_STATE;
 
 parameter REGULAR=3'b001, CONST=3'b010, WHITE1x1=3'b011, BLACK1x1=3'b100, WHITE2x2=3'b101, BLACK2x2=3'b110, RAMP_MODE=3'b111; //Work modes
-parameter COUNT = 2'b00, WAIT =2'b01, OFF=2'b10;
+parameter COUNT = 2'b00, WAIT =2'b01, OFF=2'b10, END_COUNT=2'b11;
 parameter ZERO=2'b00, ONE=2'b01, FOUR=2'b10, EIGHT=2'b11;
 parameter Y0=2'b00, Y1=2'b01, Y16=2'b10, Y1290=2'b11;
 
 always_ff@(posedge clk, negedge rst_n) begin
 	if(~rst_n) begin
-		cnt = 12'h000; 
+		counter_out = 12'h000; 
 	end else begin
 		case(STATE)
 			OFF: begin
@@ -52,10 +54,8 @@ always_ff@(posedge clk, negedge rst_n) begin
 				FLAG2x2 = 0;
 			end
 			WAIT: begin
-				if(sync) begin
-					endCnt = endCnt+1;
-					NEXT_STATE = COUNT;
-				end
+				endCnt = endCnt+1;
+				NEXT_STATE = COUNT;
 				if(endCnt == 12'd23) begin
 					endFrame = 1'b1;
 				end
@@ -64,8 +64,8 @@ always_ff@(posedge clk, negedge rst_n) begin
 					CONST: ;
 					WHITE1x1: FLAG = (endCnt % 2 == 0) ? 0 : 1;
 					BLACK1x1: FLAG = (endCnt % 2 == 0) ? 1 : 0;
-					WHITE2x2: FLAG2x2 ((endCnt % 4 == 0) || endCnt % 4 == 1) ? 2'b00 : 2'b10; 
-					BLACK2x2: FLAG2x2 ((endCnt % 4 == 0) || endCnt % 4 == 1) ? 2'b10 : 2'b00;
+					WHITE2x2: FLAG2x2 = ((endCnt % 4 == 0) || endCnt % 4 == 1) ? 2'b00 : 2'b10; 
+					BLACK2x2: FLAG2x2 = ((endCnt % 4 == 0) || endCnt % 4 == 1) ? 2'b10 : 2'b00;
 					RAMP_MODE: begin
 						case(X)
 							ZERO:		deltaX = 12'h000;
@@ -81,35 +81,41 @@ always_ff@(posedge clk, negedge rst_n) begin
 							Y1290:		deltaY = 12'h50A; //1290
 							default:	deltaY = 12'h000;
 						endcase
+						counterY = counterY;
 					end
 					default begin
 						FLAG = 0;
 						FLAG2x2 = 0;
 						counter_out = 0;
+						counterY = 0;
 					end
 				endcase
+				endCnt = endCnt+1;
 				Counter = 12'h000;
 			end
 			COUNT: begin
-				case(Mode) begin
-					REGULAR: begin
-						Counter = Counter+1;
-						counter_out = counter_out +1;
+				case(Mode)
+					REGULAR: begin						
+						for(int i=0; i<11; i++) begin
+							counter_out[i] = Counter[i]^Counter[i+1];
+						end
+						counter_out[11] = Counter[11];
 						if(Counter == 12'd4095) begin
 							if(endFrame) begin
 								NEXT_STATE = OFF;
-							end else
-								NEXT_STATE = WAIT;
+							end else						
+								NEXT_STATE = END_COUNT;
 						end
+						Counter = Counter+1;
 					end //REGULAR
 					CONST: begin
 						Counter = Counter+1;
 						counter_out = constVal;
-						if(Counter == 12'd1289) begin
+						if(Counter == 12'd1290) begin
 							if(endFrame) begin
 								NEXT_STATE = OFF;
 							end else
-								NEXT_STATE = WAIT;
+								NEXT_STATE = END_COUNT;
 						end
 					end //CONST
 					WHITE1x1: begin
@@ -120,11 +126,11 @@ always_ff@(posedge clk, negedge rst_n) begin
 							counter_out = 0;
 							FLAG = 1;
 						end
-						if(Counter == 12'd1289) begin
+						if(Counter == 12'd1290) begin
 							if(endFrame) begin
 								NEXT_STATE = OFF;
 							end else
-								NEXT_STATE = WAIT;
+								NEXT_STATE = END_COUNT;
 						end
 					end //WHITE1x1
 					BLACK1x1: begin
@@ -135,11 +141,11 @@ always_ff@(posedge clk, negedge rst_n) begin
 							FLAG = 1;
 						end
 						Counter = Counter+1;
-						if(Counter == 12'd1289) begin
+						if(Counter == 12'd1290) begin
 							if(endFrame) begin
 								NEXT_STATE = OFF;
 							end else
-								NEXT_STATE = WAIT;
+								NEXT_STATE = END_COUNT;
 						end
 					end //BLACK1x1
 					WHITE2x2: begin
@@ -150,11 +156,11 @@ always_ff@(posedge clk, negedge rst_n) begin
 						end
 						FLAG2x2 = FLAG2x2 +1;
 						Counter = Counter+1;
-						if(Counter == 12'd1289) begin
+						if(Counter == 12'd1290) begin
 							if(endFrame) begin
 								NEXT_STATE = OFF;
 							end else
-								NEXT_STATE = WAIT;
+								NEXT_STATE = END_COUNT;
 						end
 					end //WHITE2x2
 					BLACK2x2: begin
@@ -165,36 +171,40 @@ always_ff@(posedge clk, negedge rst_n) begin
 						end
 						FLAG2x2 = FLAG2x2 +1;
 						Counter = Counter+1;
-						if(Counter == 12'd1289) begin
+						if(Counter == 12'd1290) begin
 							if(endFrame) begin
 								NEXT_STATE = OFF;
 							end else
-								NEXT_STATE = WAIT;
+								NEXT_STATE = END_COUNT;
 						end
 					end //BLACK2x2
 					RAMP_MODE: begin
 						if(FLAG) begin
 							counter_out = counter_out + deltaX;
-							FLAG = 1;
 						end else begin
 							counter_out = counterY;
+							FLAG = 1;
 						end
 						Counter = Counter+1;
-						if(Counter == 12'd1289) begin
+						if(Counter == 12'd1290) begin
 							if(endFrame) begin
 								NEXT_STATE = OFF;
 							end else begin
 								counterY = counterY + deltaY;
-								NEXT_STATE = WAIT;
+								NEXT_STATE = END_COUNT;
 							end
 						end
 					end //RAMP_MODE
-				end
+				endcase
+			end
+			END_COUNT: begin
+				counter_out = 0;
+				NEXT_STATE = sync ? WAIT : END_COUNT;
 			end
 		endcase
-		
 	end
 end
+assign cnt = counter_out;
 
 
 endmodule

@@ -22,7 +22,7 @@ comp:
 					/users/epmkos/Project/design/Control.v /users/epmkos/Project/design/Counter.v \
 					/users/epmkos/Project/design/Counter12Bit.v /users/epmkos/Project/design/Counter5Bit.v \
 					/users/epmkos/Project/design/Ramp.v /users/epmkos/Project/design/Pattern_Generator.v \
-					Pattern_Generator_if.sv NeuralNet_Ref.sv Pattern_Generator_Ref_if.sv NeuralNet_sequencer.sv NeuralNet_driver.sv NeuralNet_monitor.sv NeuralNet_agent.sv NeuralNet_scoreboard.sv  NeuralNet_env.sv NeuralNet_test.sv 	NeuralNet_test_tb.sv
+					Pattern_Generator_if.sv Pattern_Generator_ref.sv Pattern_Generator_Ref_if.sv Pattern_Generator_sequencer.sv Pattern_Generator_driver.sv Pattern_Generator_monitor.sv Pattern_Generator_agent.sv Pattern_Generator_scoreboard.sv  Pattern_Generator_env.sv Pattern_Generator_test.sv 	Pattern_Generator_tb.sv
 	
 run:
 	$(SIMV)
