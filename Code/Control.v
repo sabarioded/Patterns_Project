@@ -107,7 +107,7 @@ always@(STATE or Mode or sync or f_sync or endFrame or endLine) begin
 				               (endFrame & endLine) ? IDLE 		: CB2x2;
 		RAMP:     NEXT_STATE = sync 				? START 	: 
 				               (endFrame & endLine) ? IDLE 		: RAMP;
-		default:  NEDXT_STATE = IDLE;
+		default:  NEXT_STATE = IDLE;
 	endcase
 end
 
