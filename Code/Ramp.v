@@ -61,7 +61,7 @@ end
 	
 //add deltaY every time delta rises to the output
 always@(posedge clk or negedge rst_n) begin
-	if(~rst_n) begin
+	if(rst_n) begin
 		out <= 12'h000;
 	end else begin //rst_n = 0
 		if(!ramp_enb) begin

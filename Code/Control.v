@@ -244,7 +244,7 @@ always@(STATE or Mode or X or flag or flag2x2 or endLine or sync) begin
 end
 
 always@(posedge clk or negedge rst_n) begin
-	if(~rst_n) begin
+	if(rst_n) begin
 		STATE <= IDLE;
 	end else begin
 		STATE <= NEXT_STATE;

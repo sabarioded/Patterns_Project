@@ -50,7 +50,7 @@ end
 
 //count until the frame is finished every time newLine rises.
 always@(posedge clk or negedge rst_n) begin
-	if(~rst_n) begin
+	if(rst_n) begin
 		count <= 12'h000;
 	end else begin ///rst_n = 0
 		if(b5_enb) begin
