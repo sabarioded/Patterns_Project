@@ -45,7 +45,7 @@ class Pattern_Generator_driver extends uvm_driver#(Pattern_Generator_transaction
 			//`uvm_info("NeuralNet_driver", ml_pkt.sprint(), UVM_LOW)
 			
 
-			@(negedge vif.clk)
+			@(negedge vif.clk or negedge vrefif.clk)
 			begin
 				
 				case(state)
