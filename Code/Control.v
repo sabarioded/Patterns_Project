@@ -37,7 +37,7 @@ module Control( // =================
 				delta,
 				Xmode,
 				ValSel
-				);
+);
 //******************************************
 //			Inputs & Outputs
 //******************************************
@@ -82,6 +82,7 @@ reg [2:0] 		STATE;
 reg [2:0]		NEXT_STATE;
 reg [1:0] 		flag;
 reg 			flag2x2;
+reg 			keepCount;
 
 parameter IDLE=3'b000, START=3'b001, NORMAL=3'b010, CONSTANT=3'b011, CB1x1=3'b100 ,CB2x2=3'b101 ,RAMP=3'b110; //Possible states
 parameter REGULAR=3'b001, CONST=3'b010, WHITE1x1=3'b011, BLACK1x1=3'b100, WHITE2x2=3'b101, BLACK2x2=3'b110, RAMP_MODE=3'b111; //Work modes
@@ -104,9 +105,9 @@ always@(STATE or Mode or sync or f_sync or endFrame or endLine) begin
 		CB1x1:    NEXT_STATE = sync 				? START 	: 
 							   (endFrame & endLine) ? IDLE 		: CB1x1;
 		CB2x2:    NEXT_STATE = sync 				? START 	: 
-				               (endFrame & endLine) ? IDLE 		: CB2x2;
+							   (endFrame & endLine) ? IDLE 		: CB2x2;
 		RAMP:     NEXT_STATE = sync 				? START 	: 
-				               (endFrame & endLine) ? IDLE 		: RAMP;
+							   (endFrame & endLine) ? IDLE 		: RAMP;
 		default:  NEXT_STATE = IDLE;
 	endcase
 end
@@ -121,41 +122,51 @@ always@(STATE or Mode or X or flag or flag2x2 or endLine or sync) begin
 			b5_enb = 1'b0;
 			ramp_enb = 1'b0;
 			cnt_enb = 1'b0;
+			test = 1'b0;
+			newLine = 1'b0;
+			BinaryOrGray = 1'b0;
+			delta = 1'b0;
+			Xmode = 2'b00;
+			ValSel = 2'b00;
+			flag = 2'b00;
+			flag2x2 =  1'b0;
+			keepCount = 1'b0;
 		end //end IDLE mode
 		START: begin
+			keepCount = 1'b1;
+			newLine = 1'b1;
+			cnt_enb = 1'b0;
+			b12_enb = 1'b0;
+			b5_enb = 1'b1;
+			Xmode = 2'b00;
+			delta = 1'b0;
 			case(Mode)
 				REGULAR:begin
 					BinaryOrGray = 1'b1;
-					newLine = 1'b1;
 					test = 1'b0;
 				end
 				CONST:begin
-					newLine = 1'b1;
 					ValSel = 2'b01;
 				end
 				WHITE1x1:begin
-					newLine = 1'b1;
 					if(flag[0] == 1'b0)
 						ValSel = 2'b00;
 					else
 						ValSel = 2'b10;
 				end
 				BLACK1x1:begin
-					newLine = 1'b1;
 					if(flag[0] == 1'b0)
 						ValSel = 2'b10;
 					else
 						ValSel = 2'b00;
 				end
 				WHITE2x2:begin
-					newLine = 1'b1;
 					if(flag[1] == 1'b0)
 						ValSel = 2'b00;
 					else
 						ValSel = 2'b10;
 				end
 				BLACK2x2:begin
-					newLine = 1'b1;
 					if(flag[1] == 1'b0)
 						ValSel = 2'b10;
 					else
@@ -163,37 +174,51 @@ always@(STATE or Mode or X or flag or flag2x2 or endLine or sync) begin
 				end
 				RAMP_MODE:begin
 					ramp_enb = 1'b1;
-					newLine = 1'b1;
 					ValSel = 2'b00;
+					cnt_enb = 1'b1;
 				end
 			endcase
 		end//End START mode
 		NORMAL: begin
+			newLine = 1'b0;
 			test = 1'b0;
 			BinaryOrGray = 1'b1;
-			if(endLine == 1'b0) begin
+			if((endLine == 1'b0) & (keepCount == 1'b1)) begin
 				Xmode = 1'b1;
 				ValSel = 2'b11;
+				cnt_enb = 1'b1;
+				b12_enb = 1'b1;
 			end else begin
 				cnt_enb = 1'b0;
 				b12_enb = 1'b0;
+				keepCount = 1'b0;
 			end
 		end //end NORMAL mode
 		CONSTANT: begin
-			if(endLine == 1'b0) begin
+			newLine = 1'b0;
+			test = 1'b1;
+			if((endLine == 1'b0) & (keepCount == 1'b1)) begin
 				Xmode = 1'b0;
 				ValSel = 2'b01;
+				cnt_enb = 1'b1;
+				b12_enb = 1'b1;
 			end else begin
 				cnt_enb = 1'b0;
 				b12_enb = 1'b0;
+				keepCount = 1'b0;
 			end
 		end //end CONSTANT mode
 		CB1x1: begin
-			if(endLine == 1'b0) begin
+			newLine = 1'b0;
+			test = 1'b1;
+			if((endLine == 1'b0) & (keepCount == 1'b1)) begin
 				ValSel[1] = ~ValSel[1];
+				cnt_enb = 1'b1;
+				b12_enb = 1'b1;
 			end else begin
 				cnt_enb = 1'b0;
 				b12_enb = 1'b0;
+				keepCount = 1'b0;
 			end
 			if(sync == 1'b1)
 				flag[0] = ~flag[0];
@@ -201,12 +226,17 @@ always@(STATE or Mode or X or flag or flag2x2 or endLine or sync) begin
 				flag[0] = flag[0];
 		end // End CB1x1 mode
 		CB2x2: begin
-			if(endLine == 1'b0) begin
+			newLine = 1'b0;
+			test = 1'b1;
+			if((endLine == 1'b0) & (keepCount == 1'b1)) begin
 				ValSel[1] = (flag2x2) ? ~ValSel[1]:ValSel[1];
 				flag2x2 = ~flag2x2;
+				cnt_enb = 1'b1;
+				b12_enb = 1'b1;
 			end else begin
 				cnt_enb = 1'b0;
 				b12_enb = 1'b0;
+				keepCount = 1'b0;
 			end
 			if(sync == 1'b1)
 				flag = flag + 2'b01;
@@ -214,12 +244,18 @@ always@(STATE or Mode or X or flag or flag2x2 or endLine or sync) begin
 				flag = flag;
 		end // End CB2x2 mode
 		RAMP: begin
-			if(endLine == 1'b0) begin
-				Xmode = X;
+			newLine = 1'b0;
+			test = 1'b1;
+			ramp_enb = 1'b1;
+			Xmode = X;
+			if((endLine == 1'b0) & (keepCount == 1'b1)) begin
+				cnt_enb = 1'b1;
+				b12_enb = 1'b1;
 				ValSel = 2'b11;
 			end else begin
 				cnt_enb = 1'b0;
 				b12_enb = 1'b0;
+				keepCount = 1'b0;
 			end
 			if(sync == 1'b1)
 				delta = 1'b1;
@@ -227,24 +263,25 @@ always@(STATE or Mode or X or flag or flag2x2 or endLine or sync) begin
 				delta = 1'b0;
 		end // End RAMP mode
 		default begin
-			b12_enb = 1'b1;
-			b5_enb = 1'b1;
+			b12_enb = 1'b0;
+			b5_enb = 1'b0;
 			ramp_enb = 1'b0;
-			cnt_enb = 1'b1;
-			test = 1'b1;
+			cnt_enb = 1'b0;
+			test = 1'b0;
 			newLine = 1'b0;
 			BinaryOrGray = 1'b0;
 			delta = 1'b0;
-			Xmode = 1'b0;
-			ValSel = 1'b0;
-			flag = 1'b0;
+			Xmode = 2'b00;
+			ValSel = 2'b00;
+			flag = 2'b00;
 			flag2x2 =  1'b0;
+			keepCount = 1'b0;
 		end
 	endcase
 end
 
 always@(posedge clk or negedge rst_n) begin
-	if(rst_n) begin
+	if(~rst_n) begin
 		STATE <= IDLE;
 	end else begin
 		STATE <= NEXT_STATE;

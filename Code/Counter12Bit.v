@@ -59,7 +59,7 @@ end // end always
 
 //count until the line is finished
 always@(posedge clk or negedge rst_n) begin
-	if(rst_n) begin
+	if(~rst_n) begin
 		count <= 12'h000;
 	end else begin
 		if(b12_enb) begin
