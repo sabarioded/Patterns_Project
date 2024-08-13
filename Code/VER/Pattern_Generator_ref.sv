@@ -8,8 +8,7 @@ module Pattern_Generator_ref (
 	input  [1:0] Y,        // deltaY for ramp mode
 	input  [2:0] Mode,     // work mode
 
-	output reg [11:0] cnt,     // output count
-	output [2:0] STATE
+	output reg [11:0] cnt     // output count
 );
 
 	logic [11:0] counterY;
@@ -35,7 +34,7 @@ module Pattern_Generator_ref (
 
 	// State register
 	always_ff @(posedge clk or negedge rst_n) begin
-		if (rst_n) begin
+		if (~rst_n) begin
 			STATE <= IDLE; 
 		end else begin
 			STATE <= NEXT_STATE;
@@ -69,7 +68,7 @@ module Pattern_Generator_ref (
 	
 	//FSM logic
 	always_ff@(posedge clk or negedge rst_n) begin
-		if(rst_n) begin
+		if(~rst_n) begin
 			cnt <= 12'h000;
 			endCnt <= 5'b00000;
 			endFrame <= 0;
@@ -165,7 +164,7 @@ module Pattern_Generator_ref (
 					endLine <= 1;
 					cnt <= 12'h000;
 					Counter <= Counter;
-					if(endCnt == 12'd23) begin
+					if(endCnt == 12'd24) begin
 						endFrame <= 1;
 					end
 				end else begin
@@ -181,7 +180,7 @@ module Pattern_Generator_ref (
 					endLine <= 1;
 					cnt <= 12'h000;
 					Counter <= Counter;
-					if(endCnt == 12'd23) begin
+					if(endCnt == 12'd24) begin
 						endFrame <= 1;
 					end
 				end else begin
@@ -194,7 +193,7 @@ module Pattern_Generator_ref (
 					endLine <= 1;
 					cnt <= 12'h000;
 					Counter <= Counter;
-					if(endCnt == 12'd23) begin
+					if(endCnt == 12'd24) begin
 						endFrame <= 1;
 					end
 				end else begin
@@ -212,7 +211,7 @@ module Pattern_Generator_ref (
 					endLine <= 1;
 					cnt <= 12'h000;
 					Counter <= Counter;
-					if(endCnt == 12'd23) begin
+					if(endCnt == 12'd24) begin
 						endFrame <= 1;
 					end
 				end else begin
@@ -230,7 +229,7 @@ module Pattern_Generator_ref (
 					endLine <= 1;
 					cnt <= 12'h000;
 					Counter <= Counter;
-					if(endCnt == 12'd23) begin
+					if(endCnt == 12'd24) begin
 						endFrame <= 1;
 					end
 					if(FLAG) begin

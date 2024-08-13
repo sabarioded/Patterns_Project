@@ -53,7 +53,7 @@ class Pattern_Generator_scoreboard extends uvm_scoreboard;
 
 	virtual function void compare();
 		if(transaction_dut.cnt == transaction_ref.cnt) begin
-			`uvm_info("compare", {"Test: OK!"}, UVM_LOW)
+			//`uvm_info("compare", {"Test: OK!"}, UVM_LOW)
 		end else begin
 			`uvm_info("compare", {"Test: Fail!"}, UVM_LOW)
 		end

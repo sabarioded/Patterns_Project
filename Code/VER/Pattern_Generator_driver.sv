@@ -50,13 +50,13 @@ class Pattern_Generator_driver extends uvm_driver#(Pattern_Generator_transaction
 				
 				case(state)
 					0: begin   //reset
-						vif.rst_n = 1'b1;
-						vrefif.rst_n = 1'b1;
+						vif.rst_n = 1'b0;
+						vrefif.rst_n = 1'b0;
 						state = 1;
 					end
 					1: begin   //first sync
-						 vif.rst_n = 1'b0;
-						 vrefif.rst_n = 1'b0;
+						 vif.rst_n = 1'b1;
+						 vrefif.rst_n = 1'b1;
 						 vif.f_sync = 1'b1;
 						 vif.sync = 1'b1;
 						 vrefif.f_sync = 1'b1;
@@ -71,10 +71,12 @@ class Pattern_Generator_driver extends uvm_driver#(Pattern_Generator_transaction
 						vif.constVal = ml_pkt.constVal;
 						vrefif.constVal = ml_pkt.constVal;
 						state =2;
+						lines = 0;
+						count = 0;
 						if(ml_pkt.Mode == 3'b001) begin
-							random_number = $urandom_range(6000, 4100);
+							random_number = $urandom_range(4300, 4100);
 						end else begin
-							random_number = $urandom_range(3000, 1295);
+							random_number = $urandom_range(1400, 1295);
 						end
 						 end
 					2: begin   //Count normal
@@ -85,6 +87,7 @@ class Pattern_Generator_driver extends uvm_driver#(Pattern_Generator_transaction
 							 lines = lines +1;
 							 vif.sync = 1'b1;
 							 vrefif.sync = 1'b1;
+							 count = 0;
 						 end else begin
 							 vif.sync = 1'b0;
 							 vrefif.sync = 1'b0;

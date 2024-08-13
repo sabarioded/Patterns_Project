@@ -12,7 +12,7 @@ reg [2:0] Mode;     // work mode
 
 // Outputs
 wire [11:0] cnt;   // output count
-wire [2:0] STATE;
+
 // Instantiate the DUT (Device Under Test)
 Pattern_Generator_ref dut(
 	.clk(clk),
@@ -23,8 +23,7 @@ Pattern_Generator_ref dut(
 	.X(X),
 	.Y(Y),
 	.Mode(Mode),
-	.cnt(cnt),
-	.STATE(STATE)
+	.cnt(cnt)
 );
 
 // Clock generation
