@@ -87,7 +87,7 @@ class Pattern_Generator_sequence extends uvm_sequence#(Pattern_Generator_transac
 		//Test_mode(2'b01,2'b00,3'b111);	//1-0
 		//Test_mode(2'b10,2'b00,3'b111);	//2-0
 		//Test_mode(2'b11,2'b00,3'b111);	//3-0
-		//Test_mode(2'b01,2'b01,3'b111);	//1-1
+		Test_mode(2'b01,2'b01,3'b111);	//1-1
 		//Test_mode(2'b01,2'b10,3'b111);	//1-2
 		//Test_mode(2'b01,2'b11,3'b111);	//1-3
 		//Test_mode(2'b10,2'b01,3'b111);	//2-1
