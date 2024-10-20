@@ -51,7 +51,7 @@ initial begin
 	run_test("Pattern_Generator_test");
 
 	// Ends the simulation after a specified time
-	#1000000 $finish;
+	$finish;
 end
 
 // Clock generation for the DUT

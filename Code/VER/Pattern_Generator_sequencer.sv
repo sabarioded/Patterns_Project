@@ -46,13 +46,13 @@ class Pattern_Generator_sequence extends uvm_sequence#(Pattern_Generator_transac
 
     // Main sequence body, which generates multiple transactions
     task body();
-        Pattern_Generator_transaction ml_pkt;
+        Pattern_Generator_transaction pg_pkt;
 
         // Generate and run a series of test patterns with different modes
-        `uvm_info("", "Randomize Try0", UVM_MEDIUM)
+       // `uvm_info("", "Randomize Try0", UVM_MEDIUM)
         
         // Create the first transaction object
-        ml_pkt = Pattern_Generator_transaction::type_id::create(.name("ml_pkt"), .contxt(get_full_name()));
+        pg_pkt = Pattern_Generator_transaction::type_id::create(.name("pg_pkt"), .contxt(get_full_name()));
         
         // Test different operational modes
         Test_mode($urandom_range(3, 0), $urandom_range(3, 0), 3'b001); // Regular mode
@@ -61,6 +61,7 @@ class Pattern_Generator_sequence extends uvm_sequence#(Pattern_Generator_transac
         Test_mode($urandom_range(3, 0), $urandom_range(3, 0), 3'b100); // Black 1x1 mode
         Test_mode($urandom_range(3, 0), $urandom_range(3, 0), 3'b101); // White 2x2 mode
         Test_mode($urandom_range(3, 0), $urandom_range(3, 0), 3'b110); // Black 2x2 mode
+		Test_mode($urandom_range(3, 0), $urandom_range(3, 0), 3'b000); // Inactive
         
         // Test with fixed values for the X and Y modes
         Test_mode(2'b00, 2'b00, 3'b111); // 0-0 pattern
@@ -84,22 +85,22 @@ class Pattern_Generator_sequence extends uvm_sequence#(Pattern_Generator_transac
     // Sub-task to generate a transaction with specific X, Y, and mode values
     task Test_mode(input [2:0] Xmode, input [2:0] Ymode, input [2:0] mode);
         begin
-            Pattern_Generator_transaction ml_pkt;
+            Pattern_Generator_transaction pg_pkt;
 
-            `uvm_info("", "Randomize Try0", UVM_MEDIUM)
-            ml_pkt = Pattern_Generator_transaction::type_id::create(.name("ml_pkt"), .contxt(get_full_name()));
+            //`uvm_info("", "Randomize Try0", UVM_MEDIUM)
+            pg_pkt = Pattern_Generator_transaction::type_id::create(.name("pg_pkt"), .contxt(get_full_name()));
             
             // Start the transaction item
-            start_item(ml_pkt);
+            start_item(pg_pkt);
             
             // Set the X, Y, and mode values for this transaction
-            ml_pkt.X = Xmode;
-            ml_pkt.Y = Ymode;
-            ml_pkt.constVal = $urandom_range(4095, 0);  // Random constant value
-            ml_pkt.Mode = mode;  // Set the mode
+            pg_pkt.X = Xmode;
+            pg_pkt.Y = Ymode;
+            pg_pkt.constVal = $urandom_range(4095, 0);  // Random constant value
+            pg_pkt.Mode = mode;  // Set the mode
 
             // End the transaction
-            finish_item(ml_pkt);
+            finish_item(pg_pkt);
         end
     endtask : Test_mode
 endclass: Pattern_Generator_sequence

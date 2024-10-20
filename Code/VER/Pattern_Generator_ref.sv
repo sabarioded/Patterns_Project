@@ -157,7 +157,6 @@ module Pattern_Generator_ref (
 								ONE: deltaX <= 12'h001;
 								FOUR: deltaX <= 12'h004;
 								EIGHT: deltaX <= 12'h008;
-								default: deltaX <= 12'h000;
 							endcase
 							// Set deltaY based on input Y
 							case (Y)
@@ -165,7 +164,6 @@ module Pattern_Generator_ref (
 								Y1: deltaY <= 12'h001;
 								Y16: deltaY <= 12'h010;
 								Y1290: deltaY <= 12'h50A;
-								default: deltaY <= 12'h000;
 							endcase
 							FLAG <= 0;
 						end

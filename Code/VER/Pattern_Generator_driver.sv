@@ -38,7 +38,7 @@ class Pattern_Generator_driver extends uvm_driver#(Pattern_Generator_transaction
 
 	// Drive task: Core functionality to drive the DUT and reference interfaces
 	virtual task drive();
-		Pattern_Generator_transaction ml_pkt;  // Transaction object to store data from the sequencer
+		Pattern_Generator_transaction pg_mkt;  // Transaction object to store data from the sequencer
 		integer state = 0;                     // State variable to control the driving process
 		integer count = 0;                     // Counter variable used in counting logic
 		integer random_number = 0;             // Random number used to determine sync timing
@@ -71,17 +71,17 @@ class Pattern_Generator_driver extends uvm_driver#(Pattern_Generator_transaction
 						 vrefif.sync = 1'b1;
 						 
 						 // Get the next transaction from the sequencer
-						 seq_item_port.get_next_item(ml_pkt);
+						 seq_item_port.get_next_item(pg_mkt);
 
 						 // Drive the signals with the values from the transaction
-						 vif.Mode = ml_pkt.Mode;
-						 vrefif.Mode = ml_pkt.Mode;
-						 vif.X = ml_pkt.X;
-						 vrefif.X = ml_pkt.X;
-						 vif.Y = ml_pkt.Y;
-						 vrefif.Y = ml_pkt.Y;
-						 vif.constVal = ml_pkt.constVal;
-						 vrefif.constVal = ml_pkt.constVal;
+						 vif.Mode = pg_mkt.Mode;
+						 vrefif.Mode = pg_mkt.Mode;
+						 vif.X = pg_mkt.X;
+						 vrefif.X = pg_mkt.X;
+						 vif.Y = pg_mkt.Y;
+						 vrefif.Y = pg_mkt.Y;
+						 vif.constVal = pg_mkt.constVal;
+						 vrefif.constVal = pg_mkt.constVal;
 						 
 						 // Initialize state variables for counting
 						 state = 2;
@@ -89,18 +89,18 @@ class Pattern_Generator_driver extends uvm_driver#(Pattern_Generator_transaction
 						 count = 0;
 
 						 // Determine the random number based on the mode
-						 if(ml_pkt.Mode == 3'b001) begin
+						 if(pg_mkt.Mode == 3'b001) begin
 							random_number = $urandom_range(4300, 4100);
 						 end else begin
 							random_number = $urandom_range(1400, 1295);
 						 end
 					end
-					2: begin   // Normal counting state
+					2: begin   // Run until the next sync
 						 count = count + 1;
 						 vif.f_sync = 1'b0;
 						 vrefif.f_sync = 1'b0;
 						 
-						 // Check if the count exceeds the random number
+						 // Check if the count exceeds the random number representing the next sync
 						 if(count > random_number) begin
 							 lines = lines + 1;
 							 vif.sync = 1'b1;
@@ -116,7 +116,7 @@ class Pattern_Generator_driver extends uvm_driver#(Pattern_Generator_transaction
 							 seq_item_port.item_done();  // Mark the transaction as done
 							 state = 1;  // Return to the first sync state
 						 end else begin
-							 state = 2;  // Continue in the normal counting state
+							 state = 2;  // Continue counting
 						 end
 					   end
 				endcase
