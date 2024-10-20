@@ -28,7 +28,7 @@ CFLAGS = full64
 #   -cm               : Enable code coverage with various options (line, cond, fsm, etc.)
 #   -CFLAGS -DVCS     : Pass flags to the C compiler for DPI usage
 VCS = vcs -sverilog -kdb +warn=noOBSV2G -full64 -timescale=1ns/1ns \
-        -debug_access+r+w+nomemcbk -debug_region+cell +vpi -debug_access+nomemcbk+dmptf -debug_region+cell \
+    -debug_access+r+w+nomemcbk -debug_region+cell +vpi -debug_access+nomemcbk+dmptf -debug_region+cell \
 	+define+UVM_OBJECT_MUST_HAVE_CONSTRUCTOR \
 	+incdir+$(UVM_HOME)/src $(UVM_HOME)/src/uvm.sv \
 	-cm_cond allops+anywidth+event -cm_noconst \
@@ -55,11 +55,13 @@ x: comp run
 #   +incdir+.        : Adds the current directory to the include search path
 #   Lists all design files, interface files, and testbench files necessary for the project.
 comp:
-	$(VCS) +incdir+. /users/epmkos/Project/design/Binary2Gray.v  \
-					/users/epmkos/Project/design/Control.v /users/epmkos/Project/design/Counter.v \
-					/users/epmkos/Project/design/Counter12Bit.v /users/epmkos/Project/design/Counter5Bit.v \
-					/users/epmkos/Project/design/Ramp.v /users/epmkos/Project/design/Pattern_Generator.v \
-					Pattern_Generator_if.sv Pattern_Generator_ref.sv Pattern_Generator_Ref_if.sv Pattern_Generator_sequencer.sv Pattern_Generator_driver.sv Pattern_Generator_monitor.sv Pattern_Generator_agent.sv Pattern_Generator_scoreboard.sv  Pattern_Generator_env.sv Pattern_Generator_test.sv 	Pattern_Generator_top_tb.sv
+	$(VCS) +incdir+. Binary2Gray.v Control.v Counter.v Counter12Bit.v Counter5Bit.v Ramp.v Pattern_Generator.v \
+					VER/Pattern_Generator_if.sv VER/Pattern_Generator_ref.sv \
+					VER/Pattern_Generator_Ref_if.sv VER/Pattern_Generator_sequencer.sv \
+					VER/Pattern_Generator_driver.sv VER/Pattern_Generator_monitor.sv \
+					VER/Pattern_Generator_agent.sv VER/Pattern_Generator_scoreboard.sv \
+					VER/Pattern_Generator_env.sv VER/Pattern_Generator_test.sv \
+					VER/Pattern_Generator_top_tb.sv
 
 # Run target: runs the simulation after compilation
 run:
