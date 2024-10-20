@@ -48,7 +48,6 @@ always@(Xmode) begin
 		ONE:		deltaX = 4'h1;
 		FOUR:		deltaX = 4'h4;
 		EIGHT:		deltaX = 4'h8;
-		default:	deltaX = 4'h0;
 	endcase
 end
 	

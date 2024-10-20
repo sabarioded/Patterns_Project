@@ -55,7 +55,6 @@ always@(Y) begin
 		Y1:			deltaY = 11'h001; //1
 		Y16:		deltaY = 11'h010; //16
 		Y1290:		deltaY = 11'h50A; //1290
-		default:	deltaY = 11'h000;
 	endcase
 end
 	

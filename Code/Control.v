@@ -2,15 +2,21 @@
  * File          : Control.v
  * Project       : Patterns
  * Author        : Oded and Margarita
- * Description   : This module is the control block of the system.
-					This state mealy machine has 7 states:
-					IDLE: while the system is inactive.
-					START: prepare the system for the next run.
-					NORMAL: Count up to 4095 using gray code.
-					CONSTANT: test mode, the output is a constant val from user input, 1290 values.
-					CB1x1: test mode, the output is a 1x1 checkerboard, white is 12'b0 and black is 12'b1. 1290 values.
-					CB2x2: test mode, the output is a 2x2 checkerboard where white is 12'b0 and black is 12'b1, 1290 values. 
-					RAMP: test mode, count with increments of deltaX between coloumns and deltaY between rows, 1290 values. 
+ * Description   : This module implements the control block of the system as a 
+ *                 Mealy state machine with seven states. The states are:
+ *                 
+ *                 IDLE: System is inactive.
+ *                 START: Prepares the system for the next operation.
+ *                 NORMAL: Counts up to 4095 using Gray code.
+ *                 CONSTANT: Test mode that outputs a constant value based on 
+ *                           user input (1290 values).
+ *                 CB1x1: Test mode that outputs a 1x1 checkerboard pattern 
+ *                         (white represented as 12'b0 and black as 12'b1) 
+ *                         for 1290 values.
+ *                 CB2x2: Test mode that outputs a 2x2 checkerboard pattern 
+ *                         (white as 12'b0 and black as 12'b1) for 1290 values.
+ *                 RAMP: Test mode that counts with increments of deltaX 
+ *                        between columns and deltaY between rows for 1290 values.
  *------------------------------------------------------------------------------*/
 module Control( // =================
 				//		Inputs
@@ -229,9 +235,6 @@ always@(STATE or Mode or X or flag or flag2x2 or endLine or sync) begin
 				BLACK2x2: begin
 						flag = (sync) ? (flag+2'b01) : flag;
 						end
-				default: begin 
-						flag = 2'b00;
-						end
 			endcase
 		end // End CB0 mode
 		CB1: begin
@@ -254,9 +257,6 @@ always@(STATE or Mode or X or flag or flag2x2 or endLine or sync) begin
 						end
 				BLACK2x2: begin
 						flag = (sync) ? (flag+2'b01) : flag;
-						end
-				default: begin 
-						flag = 2'b00;
 						end
 			endcase
 		end // End CB1 mode
