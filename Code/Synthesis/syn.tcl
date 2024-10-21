@@ -29,8 +29,9 @@ compile -exact_map
 write -hierarchy -format verilog -output Pattern_Generator_syn.v
 
 # Report area and timing
-report_area
-report_timing
+report_area > area_report.rpt
+report_timing > timing_report.rpt
+check_design > check_design.rpt
 
 # Write reports (optional)
 report_constraint -all_violators > constraints_report.rpt
