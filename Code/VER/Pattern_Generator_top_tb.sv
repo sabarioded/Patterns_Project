@@ -18,8 +18,22 @@ Pattern_Generator_Ref_if vrefif(); // Interface for the reference model
 
 // Instantiate the reference model (Ref)
 Pattern_Generator_ref Ref(
-	.clk(vif.clk),          // Connect reference clock to vif interface clock
-	.rst_n(vif.rst_n),      // Connect reference reset to vif interface reset
+	.clk(vrefif.clk),          // Connect reference clock to vif interface clock
+	.rst_n(vrefif.rst_n),      // Connect reference reset to vif interface reset
+	.f_sync(vrefif.f_sync),    // Connect first sync signal
+	.sync(vrefif.sync),        // Connect sync signal
+	.constVal(vrefif.constVal),// Connect constant value signal
+	.X(vrefif.X),              // Connect X delta for ramp mode
+	.Y(vrefif.Y),              // Connect Y delta for ramp mode
+	.Mode(vrefif.Mode),        // Connect work mode signal
+	.Counter_ver(vrefif.Counter_ver),	//for verification
+	.cnt(vrefif.cnt)           // Connect count output signal
+);
+
+// Instantiate the DUT (Pattern Generator)
+Pattern_Generator dut(
+	.clk(vif.clk),          // Connect DUT clock to reference interface clock
+	.rst_n(vif.rst_n),      // Connect DUT reset to reference interface reset
 	.f_sync(vif.f_sync),    // Connect first sync signal
 	.sync(vif.sync),        // Connect sync signal
 	.constVal(vif.constVal),// Connect constant value signal
@@ -27,19 +41,6 @@ Pattern_Generator_ref Ref(
 	.Y(vif.Y),              // Connect Y delta for ramp mode
 	.Mode(vif.Mode),        // Connect work mode signal
 	.cnt(vif.cnt)           // Connect count output signal
-);
-
-// Instantiate the DUT (Pattern Generator)
-Pattern_Generator dut(
-	.clk(vrefif.clk),          // Connect DUT clock to reference interface clock
-	.rst_n(vrefif.rst_n),      // Connect DUT reset to reference interface reset
-	.f_sync(vrefif.f_sync),    // Connect first sync signal
-	.sync(vrefif.sync),        // Connect sync signal
-	.constVal(vrefif.constVal),// Connect constant value signal
-	.X(vrefif.X),              // Connect X delta for ramp mode
-	.Y(vrefif.Y),              // Connect Y delta for ramp mode
-	.Mode(vrefif.Mode),        // Connect work mode signal
-	.cnt(vrefif.cnt)           // Connect count output signal
 );
 
 initial begin

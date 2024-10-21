@@ -8,6 +8,7 @@ module Pattern_Generator_ref (
 	input  [1:0] Y,        // deltaY for RAMP mode
 	input  [2:0] Mode,     // Mode selection
 
+	output reg [11:0] Counter_ver, //for verification
 	output reg [11:0] cnt     // Output count
 );
 
@@ -80,6 +81,7 @@ module Pattern_Generator_ref (
 			deltaY <= 12'h000;
 			Counter <= 12'h000;
 			counterY <= 12'h000;
+			Counter_ver <=12'h000;
 		end else begin
 			case (STATE)
 				IDLE: begin
@@ -183,6 +185,7 @@ module Pattern_Generator_ref (
 						// XOR-based counter logic
 						for (int i = 0; i < 11; i++) begin
 							cnt[i] <= Counter[i] ^ Counter[i + 1];
+							Counter_ver <= Counter;
 						end
 						cnt[11] <= Counter[11];
 						Counter <= Counter + 1;
@@ -199,6 +202,7 @@ module Pattern_Generator_ref (
 						end
 					end else begin
 						cnt <= constVal;
+						Counter_ver <= Counter;
 						Counter <= Counter + 1;
 					end
 				end
@@ -219,6 +223,7 @@ module Pattern_Generator_ref (
 							cnt <= 12'h000;
 							FLAG <= 1;
 						end
+						Counter_ver <= Counter;
 						Counter <= Counter + 1;
 					end
 				end
@@ -239,6 +244,7 @@ module Pattern_Generator_ref (
 							cnt <= 12'h000;
 						end
 						FLAG2x2 <= FLAG2x2 + 1;
+						Counter_ver <= Counter;
 						Counter <= Counter + 1;
 					end
 				end
@@ -264,6 +270,7 @@ module Pattern_Generator_ref (
 							cnt <= counterY;
 							FLAG <= 1;
 						end
+						Counter_ver <= Counter;
 						Counter <= Counter + 1;
 					end
 				end

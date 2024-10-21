@@ -27,7 +27,8 @@ interface Pattern_Generator_Ref_if;
     // =================
     //    Outputs
     // =================
-    
+	
+    logic [11:0] Counter_ver; //for verificaiton
     logic  [11:0] cnt;     // Output count, the primary output of the pattern generator
 
 endinterface : Pattern_Generator_Ref_if

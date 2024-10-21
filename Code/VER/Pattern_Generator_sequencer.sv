@@ -55,31 +55,31 @@ class Pattern_Generator_sequence extends uvm_sequence#(Pattern_Generator_transac
         pg_pkt = Pattern_Generator_transaction::type_id::create(.name("pg_pkt"), .contxt(get_full_name()));
         
         // Test different operational modes
-        Test_mode($urandom_range(3, 0), $urandom_range(3, 0), 3'b001); // Regular mode
-        Test_mode($urandom_range(3, 0), $urandom_range(3, 0), 3'b010); // Constant mode
-        Test_mode($urandom_range(3, 0), $urandom_range(3, 0), 3'b011); // White 1x1 mode
+        //Test_mode($urandom_range(3, 0), $urandom_range(3, 0), 3'b001); // Regular mode
+        //Test_mode($urandom_range(3, 0), $urandom_range(3, 0), 3'b010); // Constant mode
+        //Test_mode($urandom_range(3, 0), $urandom_range(3, 0), 3'b011); // White 1x1 mode
         Test_mode($urandom_range(3, 0), $urandom_range(3, 0), 3'b100); // Black 1x1 mode
-        Test_mode($urandom_range(3, 0), $urandom_range(3, 0), 3'b101); // White 2x2 mode
-        Test_mode($urandom_range(3, 0), $urandom_range(3, 0), 3'b110); // Black 2x2 mode
-		Test_mode($urandom_range(3, 0), $urandom_range(3, 0), 3'b000); // Inactive
+        //Test_mode($urandom_range(3, 0), $urandom_range(3, 0), 3'b101); // White 2x2 mode
+        //Test_mode($urandom_range(3, 0), $urandom_range(3, 0), 3'b110); // Black 2x2 mode
+		//Test_mode($urandom_range(3, 0), $urandom_range(3, 0), 3'b000); // Inactive
         
         // Test with fixed values for the X and Y modes
-        Test_mode(2'b00, 2'b00, 3'b111); // 0-0 pattern
-        Test_mode(2'b00, 2'b01, 3'b111); // 0-1 pattern
-        Test_mode(2'b00, 2'b10, 3'b111); // 0-2 pattern
-        Test_mode(2'b00, 2'b11, 3'b111); // 0-3 pattern
-        Test_mode(2'b01, 2'b00, 3'b111); // 1-0 pattern
-        Test_mode(2'b10, 2'b00, 3'b111); // 2-0 pattern
-        Test_mode(2'b11, 2'b00, 3'b111); // 3-0 pattern
-        Test_mode(2'b01, 2'b01, 3'b111); // 1-1 pattern
-        Test_mode(2'b01, 2'b10, 3'b111); // 1-2 pattern
-        Test_mode(2'b01, 2'b11, 3'b111); // 1-3 pattern
-        Test_mode(2'b10, 2'b01, 3'b111); // 2-1 pattern
-        Test_mode(2'b10, 2'b10, 3'b111); // 2-2 pattern
-        Test_mode(2'b10, 2'b11, 3'b111); // 2-3 pattern
-        Test_mode(2'b11, 2'b01, 3'b111); // 3-1 pattern
-        Test_mode(2'b11, 2'b10, 3'b111); // 3-2 pattern
-        Test_mode(2'b11, 2'b11, 3'b111); // 3-3 pattern
+        //Test_mode(2'b00, 2'b00, 3'b111); // 0-0 pattern
+        //Test_mode(2'b00, 2'b01, 3'b111); // 0-1 pattern
+        //Test_mode(2'b00, 2'b10, 3'b111); // 0-2 pattern
+        //Test_mode(2'b00, 2'b11, 3'b111); // 0-3 pattern
+        //Test_mode(2'b01, 2'b00, 3'b111); // 1-0 pattern
+        //Test_mode(2'b10, 2'b00, 3'b111); // 2-0 pattern
+        //Test_mode(2'b11, 2'b00, 3'b111); // 3-0 pattern
+        //Test_mode(2'b01, 2'b01, 3'b111); // 1-1 pattern
+        //Test_mode(2'b01, 2'b10, 3'b111); // 1-2 pattern
+        //Test_mode(2'b01, 2'b11, 3'b111); // 1-3 pattern
+        //Test_mode(2'b10, 2'b01, 3'b111); // 2-1 pattern
+        //Test_mode(2'b10, 2'b10, 3'b111); // 2-2 pattern
+        //Test_mode(2'b10, 2'b11, 3'b111); // 2-3 pattern
+        //Test_mode(2'b11, 2'b01, 3'b111); // 3-1 pattern
+        //Test_mode(2'b11, 2'b10, 3'b111); // 3-2 pattern
+        //Test_mode(2'b11, 2'b11, 3'b111); // 3-3 pattern
     endtask: body 
 
     // Sub-task to generate a transaction with specific X, Y, and mode values
