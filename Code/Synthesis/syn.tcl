@@ -26,7 +26,7 @@ set_input_delay 1 [all_inputs] -clock clk
 set_output_delay 1 [all_outputs] -clock clk
 
 # Set maximum transition time for nets
-set_max_transition 0.1 [all_nets]
+set_max_transition 0.1 [get_nets *]
 
 # Set optimization options for sequential mapping
 set compile_seqmap_propagate_constants false
