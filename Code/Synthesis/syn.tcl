@@ -18,6 +18,16 @@ current_design Pattern_Generator
 # Create the clock signal with a period of 16 units and a 50% duty cycle
 create_clock -name "clk" -period 16 -waveform { 0 8 } [get_ports clk]
 
+# Set clock uncertainty
+set_clock_uncertainty 0.1 [get_clocks clk]
+
+# Define input and output delays
+set_input_delay 1 [all_inputs] -clock clk
+set_output_delay 1 [all_outputs] -clock clk
+
+# Set maximum transition time for nets
+set_max_transition 0.1 [all_nets]
+
 # Set optimization options for sequential mapping
 set compile_seqmap_propagate_constants false
 set compile_seqmap_propagate_high_effort false
@@ -33,7 +43,6 @@ report_area > area_report.rpt
 report_timing > timing_report.rpt
 check_design > check_design.rpt
 
-# Write reports (optional)
+# Write additional reports (optional)
 report_constraint -all_violators > constraints_report.rpt
 report_power > power_report.rpt
-
