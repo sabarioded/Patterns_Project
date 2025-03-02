@@ -10,13 +10,13 @@
 class Pattern_Generator_transaction extends uvm_sequence_item;
     
     // Fields for the transaction
-    logic              f_sync;          // First sync signal
-    logic              sync;            // Sync signal, starts the count
-    rand logic [11:0]  constVal;        // Constant value for specific modes
-    logic [1:0]        X;               // deltaX for ramp mode
-    logic [1:0]        Y;               // deltaY for ramp mode
-    logic [2:0]        Mode;            // Work mode
-    logic [11:0]       cnt;             // Output count
+    bit              f_sync;          // First sync signal
+    bit              sync;            // Sync signal, starts the count
+    rand bit [11:0]  constVal;        // Constant value for specific modes
+    bit [1:0]        X;               // deltaX for ramp mode
+    bit [1:0]        Y;               // deltaY for ramp mode
+    bit [2:0]        Mode;            // Work mode
+    bit [11:0]       cnt;             // Output count
 
     // Constructor: Initializes the transaction object
     function new(string name = "");
@@ -46,13 +46,6 @@ class Pattern_Generator_sequence extends uvm_sequence#(Pattern_Generator_transac
 
     // Main sequence body, which generates multiple transactions
     task body();
-        Pattern_Generator_transaction pg_pkt;
-
-        // Generate and run a series of test patterns with different modes
-       // `uvm_info("", "Randomize Try0", UVM_MEDIUM)
-        
-        // Create the first transaction object
-        pg_pkt = Pattern_Generator_transaction::type_id::create(.name("pg_pkt"), .contxt(get_full_name()));
         
         // Test different operational modes
         //Test_mode($urandom_range(3, 0), $urandom_range(3, 0), 3'b001); // Regular mode
@@ -61,7 +54,7 @@ class Pattern_Generator_sequence extends uvm_sequence#(Pattern_Generator_transac
         Test_mode($urandom_range(3, 0), $urandom_range(3, 0), 3'b100); // Black 1x1 mode
         //Test_mode($urandom_range(3, 0), $urandom_range(3, 0), 3'b101); // White 2x2 mode
         //Test_mode($urandom_range(3, 0), $urandom_range(3, 0), 3'b110); // Black 2x2 mode
-		//Test_mode($urandom_range(3, 0), $urandom_range(3, 0), 3'b000); // Inactive
+	//Test_mode($urandom_range(3, 0), $urandom_range(3, 0), 3'b000); // Inactive
         
         // Test with fixed values for the X and Y modes
         //Test_mode(2'b00, 2'b00, 3'b111); // 0-0 pattern
@@ -89,6 +82,7 @@ class Pattern_Generator_sequence extends uvm_sequence#(Pattern_Generator_transac
 
             //`uvm_info("", "Randomize Try0", UVM_MEDIUM)
             pg_pkt = Pattern_Generator_transaction::type_id::create(.name("pg_pkt"), .contxt(get_full_name()));
+	    pg_pkt.randomize();
             
             // Start the transaction item
             start_item(pg_pkt);
@@ -96,7 +90,6 @@ class Pattern_Generator_sequence extends uvm_sequence#(Pattern_Generator_transac
             // Set the X, Y, and mode values for this transaction
             pg_pkt.X = Xmode;
             pg_pkt.Y = Ymode;
-            pg_pkt.constVal = $urandom_range(4095, 0);  // Random constant value
             pg_pkt.Mode = mode;  // Set the mode
 
             // End the transaction
